@@ -1,2 +1,2 @@
-# Tabela-Estilizada-kableExtra
-Este repositório mostra o uso do pacote kableExtra em R para criar tabelas personalizadas e estilizadas, focadas na clareza visual e formatação avançada. O projeto destaca a aplicação prática do kableExtra em dados específicos, ideal para relatórios e publicações.
+# Estilização Avançada de Tabelas com kableExtra em R
+Este repositório apresenta um trabalho desenvolvido utilizando o pacote kableExtra em R. O objetivo principal foi a criação de tabelas personalizadas e estilizadas para melhorar a apresentação e a interpretação dos dados. As tabelas foram geradas com foco em clareza visual e formatação avançada, adequadas para relatórios e publicações. O projeto demonstra a aplicação prática do kableExtra em um conjunto de dados específico, destacando as suas funcionalidades para manipulação de tabelas e customização de layouts.
