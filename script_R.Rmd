@@ -1,0 +1,509 @@
+--- 
+title: <center>_**Trabalho Estilização Avançada de Tabelas com kableExtra em R**_</center> 
+author: <center>_**Sophia Araújo**_<center>
+output: 
+    html_document:
+        toc: yes
+        toc_float:
+            collapsed: yes
+            smooth_scroll: no   
+---
+
+
+<center>
+***
+![](https://www.ufmg.br/marca/ass6.jpg)
+
+
+
+***
+</center>
+
+<div align="justify">
+
+
+
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+#Pacotes utilizados
+
+library(EnvStats)
+library(knitr)
+library(kableExtra)
+require(tidyverse)
+
+
+# Banco de dados padrão a ser utilizado
+data(iris)
+
+data(iris)
+iris = as.tibble(iris)
+
+knitr::opts_chunk$set(echo = TRUE)
+
+tabela<- iris[1:5,]
+#Banco usado para testar dimensionamento
+bd <- cbind(iris[1:10,],iris[1:10,],iris[1:10,])
+
+banco <- head(iris)
+banco
+base <- banco %>%
+  kbl(align = c(rep("c",5)), caption = "Exemplo de kable com banco iris")
+base
+```
+
+
+# Introdução
+
+Este trabalho tem como propósito explorar os recursos do pacote *kableExtra*. Ele é um pacote que possibilita a geração de tabelas personalizadas  para HTML, LaTeX  e para o R Markdown. No caso, nosso trabalho irá compreender apenas as funcionalidades para o R Markdown que em suma possibilitam,  a implementação de recursos a uma saída kable(), por meio da adição de camadas(%>)%.
+
+\
+
+# Começando a utilizar o pacote
+Como qualquer outro pacote, para utilizar o *kableExtra*, devemos instala-lo e carrega-lo **install.packages("kableExtra"), library(kableExtra)**. Como ele faz parte do ecossistema knitr::kable(), é necessário instalar também o pacote knitr **install.packages("knitr"), library(tidyverse)**.
+
+\
+
+# Função Kable
+Nesse sentido, é fundamental compreender como funciona *knitr::kable()*. O kable(), função no knitr, é um gerador de tabelas retangulares, como matrizes e quadros de dados. Apesar de ter algumas lacunas, no que tange o processo de estilização das tabelas, a função kable() já traz alguns argumentos para a personalização das tabelas geradas, dentre eles importa salientar:
+
+  - **format:** Esse argumento é definido automaticamente na função, de acordo com o formato do documento de origem do knitr. Desse modo, podendo assumir os seguintes formatos: pipe, latex, html e rst. No caso do R Markdown, o formato pipe é o padrão, e sua saída seria tabelas com colunas separadas por simples barras verticais:
+  
+```{r}
+knitr::kable(tabela, format= "pipe")
+```
+
+- **col.names:** Para alterar o nome das colunas;
+- **caption:** Para adição de legendas:
+```{r}
+knitr::kable(tabela, format= "pipe", col.names = c('Comprimento Sepal',	'Largura Sépala',	'Comprimento da pétala',	'Largura da pétala', 	'Espécies'), caption = "Caption é o argumento utilizado para fazer legendas")
+```
+
+- **bold** Um valor T / F (verdadeiro ou falso) para controlar se o texto deve ser em negrito;
+
+- **italic** Um valor T / F para controlar se o texto deve ser enfatizado;
+
+- **monospace** Um valor T / F para controlar se o texto da coluna selecionada precisa ser monoespaçado (literalmente);
+
+- **underline** um valor T / F para controlar se o texto da linha selecionada precisa ser sublinhado;
+
+- **strikeout** Um valor T / F para controlar se o texto da linha selecionada precisa ser riscado Fora;
+
+- **align** Uma string de caracteres para o alinhamento da célula. Para HTML, os valores possíveis podem ser l, c,
+r mais esquerda, centro, direita, justificar, inicial e herdar enquanto para LaTeX,
+você só pode escolher entre l, c e r;
+
+- **color** Uma sequência de caracteres / vetor para a cor do texto. Aqui, preste atenção às diferenças nos códigos de cores entre HTML e LaTex;
+
+- **background** Uma sequência de caracteres / vetor para a cor de fundo. Aqui, por favor, preste atenção ao
+diferenças nos códigos de cores entre HTML e LaTeX. Observe também que em HTML,
+background definido em cell_spec não cobrirá toda a célula;
+
+- **font_size** Uma entrada / vetor numérico para o tamanho da fonte. Para HTML, você também pode usar opções
+incluindo xx-pequeno, x-pequeno, pequeno, médio, grande, x-grande, xx-grande;
+menor, maior, inicial e herdado.
+
+
+- **angle** 0-360, grau que o texto irá girar;
+
+- **escape** Um valor T / F mostrando se os caracteres especiais devem ser escapados;
+
+- **line** Um valor T / F para controlar se uma linha aparecerá abaixo do cabeçalho;
+
+- **line_sep** Um valor numérico que indica o quanto as linhas médias devem ser separadas por
+espaço. O padrão é 3;
+
+- **extra_css** Uma opção apenas HTML. O CSS definido aqui será enviado para a célula td;
+
+- **include_empty** Se células vazias em HTML também devem ser estilizadas. O padrão é FALSE;
+
+- **border_left** T / F opção para borda do lado esquerdo em látex;
+
+- **border_right** T / F opção para borda do lado direito em látex.
+
+     
+# Pacote kableExtra
+Como exposto anteriormente, diante das funcionalidades ausentes do knitr::kable, o pacote *kableExtra* preencheu as lacunas perfeitamente, por meio de suas funções. 
+
+## Tema bootstrap
+
+Kable_styling  é a principal função do pacote *kableExtra*, pois por meio de seus argumentos ela permite estilizar as tabelas,ou seja: permite o alinhamento da tabela na página, o dimensionamento da largura e a alteração do tamanho da fonte da tabela, dentre outras funcionalidades... 
+Nesse sentido, importa destacar os principais argumentos relevantes:começando pelas opções do "bootstrap_options":
+
+- **basic;** 
+
+- **striped;** 
+
+- **bordered;** 
+
+- **hover;** 
+
+- **condensed;** 
+
+- **responsive;**
+
+- **none;**
+
+</center>
+```{r message=FALSE, warning=FALSE}
+base %>%
+  kable_styling(bootstrap_options = "striped",font_size = 9)
+```
+</center>
+
+</center>
+```{r message=FALSE, warning=FALSE}
+base %>%
+  kable_styling(bootstrap_options = "bordered",font_size = 9)
+```
+</center>
+
+</center>
+```{r message=FALSE, warning=FALSE}
+base %>%
+  kable_styling(bootstrap_options = "hover",font_size = 9)
+```
+</center>
+
+</center>
+```{r message=FALSE, warning=FALSE}
+base %>%
+  kable_styling(bootstrap_options = "condensed",font_size = 9)
+```
+</center>
+
+</center>
+```{r message=FALSE, warning=FALSE}
+base %>%
+  kable_styling(bootstrap_options = "responsive",font_size = 9)
+```
+</center>
+
+As opções do bootstrap não são mutualmente exclusivas, pois é possível colocar todas juntas, em um mesmo código:
+
+```{r message=FALSE, warning=FALSE}
+base %>%
+  kable_styling(bootstrap_options = c("striped", "bordered", "hover", "condensed", "responsive"),font_size = 10)
+```
+
+
+A função Kable_styling também permite fazer as seguintes alterações nas tabelas:
+
+- **font_size:** Permite a alteração do tamanho da fonte da tabela;
+- **row_spec(), column_spec():** Estilizar linhas e colunas individuais;
+- **html_font:** Mudar o formato da fonte;
+- **full_width(),position():**Possível alterar a largura e posição da tabela;
+- **row_spec:** Possível alterar as linhas de cabeçalho da tabela;
+- **footnote:** Para adicionar notas de rodapé;
+- **column_spec:** Especificação de linha;
+- **add_header_above:** Utiizado para adicionar linhas de cabeçalho às colunas.
+
+
+</center>
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+kable(tabela, booktabs = TRUE) %>%
+  row_spec(c(1,4,5),color= "blue", bold = TRUE, italic = TRUE) %>% 
+  row_spec(2:3, color = 'white', background = 'green') %>%
+  column_spec(5, strikeout = TRUE) %>%
+  kable_styling(font_size = 11, html_font = "\"Arial Narrow\", \"Source Sans Pro\", sans-serif") %>%
+  footnote(general = "Comentários da tabéla ",
+           number = c("Rodapé 1; ", "Rodapé 2; "),
+           alphabet = c("Rodapé A; ", "Rodapé B; "),
+           symbol = c("Rodapé simbolo 1; ", "Rodapé simbolo 2"))
+
+```
+</center>
+
+
+
+```{r}
+kable(tabela, booktabs = TRUE) %>%
+  kable_styling(font_size = 9, html_font = "\"Trebuchet MS\", verdana, sans-serif",full_width = F, position = "left") %>%   
+  row_spec(0, angle = -45)
+
+```
+
+```{r echo=FALSE, fig.fullwidth=TRUE, fig.height=10, fig.width=10, message=FALSE, warning=FALSE}
+
+#Código utilizado em nosso trabalho de simulação monte carlo e amostra bootstrap
+
+#Parte I: geração amostras- normal e exponencial
+situacao_normal<- function(n){
+  set.seed(10)
+  amostra_normal<- rnorm(n,0,1)
+  return(amostra_normal)
+}
+
+amostragem5_normal <- situacao_normal(5)
+amostragem30_normal <- situacao_normal(30)
+amostragem50_normal <- situacao_normal(50)
+amostragem100_normal <- situacao_normal(100)
+amostragem500_normal <- situacao_normal(500)
+amostragem1000_normal <- situacao_normal(1000)
+  
+situacao_exp<- function(n){
+  set.seed(10)
+  amostra_exp<- rexp(n,1)
+  return(amostra_exp)
+  
+}
+
+amostragem5_exp <- situacao_exp(5)
+amostragem30_exp <- situacao_exp(30)
+amostragem50_exp <- situacao_exp(50)
+amostragem100_exp <- situacao_exp(100)
+amostragem500_exp <- situacao_exp(500)
+amostragem1000_exp <- situacao_exp(1000)
+
+
+#Parte II) Bootstrap
+## proporcao
+
+proporcao_geral<- function(varpontual,lista,n){
+  proporcao<- c()
+  
+  for (i in 1:1000){
+    grupo14 = lista[[i]]
+    if (varpontual >= grupo14[1] & varpontual <= grupo14[2]){
+      proporcao[i] <- 1
+    }
+    else {proporcao[i]<-0}
+  }
+  return(mean(proporcao))
+}
+
+## bootstrap
+
+funcaobootstrap = function(amostragem,n){
+  
+  var_amostral <- var(amostragem)
+  sd_amostral = sd(amostragem)
+  var200 = NULL
+  #replicar 200 vezes um vetor de tamanho n
+  for(b in 1:200){
+    lista200<- sample(amostragem, n, replace=T)
+    var200[b] <- var(lista200) ## estimativa pontual
+    
+    
+  }
+  
+  erro200 = sd(var200) ##erro padrao
+  erro200 = round(erro200,3)
+  
+  ## intervalo de confian?a
+  intervalo = list()
+  for (i in 1:200) {
+    
+    limite_inferior<- (var_amostral) - (1.96*erro200)
+    limite_inferior<- round(limite_inferior, 3)
+    limite_superior<- (var_amostral) +(1.96*erro200)
+    limite_superior<- round(limite_superior, 3)
+    intervalo[[i]]<-(c(limite_inferior,limite_superior))
+    intervalo[[i]]
+    
+  }
+  
+  variancia = var200[200]
+  variancia = round(variancia,3)
+  intervalo = intervalo[200]
+  listaderetorno = list(variancia, intervalo, erro200)
+  
+  return(listaderetorno)
+  
+  
+}
+
+#Parte III) Monte Carlo- Exponencial e normal
+# MONTE CARLO EXP
+
+montecarloexp = function(amostra,n){
+  var_real = var(amostra)
+  intervaloboot = list()
+  intervaloparametrico = c()
+  
+  
+  for (i in 1:1000) {
+    novaamostra = rexp(n, 1)
+    intervaloboots = funcaobootstrap(novaamostra, n)
+    intervaloboot[i] = intervaloboots[[2]]
+    intervaloparametricoo = inter_parametrico(novaamostra)
+    intervaloparametricoo = intervaloparametricoo$conf.int
+    intervaloparametricoo = c(intervaloparametricoo[1], intervaloparametricoo[2])
+    intervaloparametricoo = as.vector(intervaloparametricoo)
+    intervaloparametrico[[i]] = intervaloparametricoo
+    
+  }
+  proporcaoboot = proporcao_geral(var_real,intervaloboot,n)
+  proporcaoparametrica = proporcao_geral(var_real,intervaloparametrico,n)
+  proporcoes = c(proporcaoboot,proporcaoparametrica)
+  
+  
+  return(proporcoes)
+  
+}
+
+# MONTE CARLO NORMAL
+
+montecarlonorm = function(amostra,n){
+  var_real = var(amostra)
+  intervaloboot = list()
+  intervaloparametrico = c()
+  
+  
+  for (i in 1:1000) {
+    novaamostra = rnorm(n, mean = 0 , sd = 1)
+    intervaloboots = funcaobootstrap(novaamostra, n)
+    intervaloboot[i] = intervaloboots[[2]]
+    intervaloparametricoo = inter_parametrico(novaamostra)
+    intervaloparametricoo = intervaloparametricoo$conf.int
+    intervaloparametricoo = c(intervaloparametricoo[1], intervaloparametricoo[2])
+    intervaloparametricoo = as.vector(intervaloparametricoo)
+    intervaloparametrico[[i]] = intervaloparametricoo
+    
+  }
+  proporcaoboot = proporcao_geral(var_real,intervaloboot,n)
+  proporcaoparametrica = proporcao_geral(var_real,intervaloparametrico,n)
+  proporcoes = c(proporcaoboot,proporcaoparametrica)
+  
+  
+  return(proporcoes)
+  
+}
+
+# Parte IV) INTERVALO PARAMÉTRICO
+
+inter_parametrico<- function(amostra){
+  intervalo_parametrico<-varTest(amostra, "two.sided", conf.level = 0.95)
+  return(intervalo_parametrico)
+}
+
+
+
+# Parte V) Aplicação da função bootstrap, para os diferentes tamanhos das amostras- com distribuição normal e exponencial
+aux1 = funcaobootstrap(amostragem5_normal, 5)
+aux2 = funcaobootstrap(amostragem30_normal, 30)
+aux3 = funcaobootstrap(amostragem50_normal, 50)
+aux4 = funcaobootstrap(amostragem100_normal, 100)
+aux5 = funcaobootstrap(amostragem500_normal, 500)
+aux6 = funcaobootstrap(amostragem1000_normal, 1000)
+
+aux7 = funcaobootstrap(amostragem5_exp, 5)
+aux8 = funcaobootstrap(amostragem30_exp, 30)
+aux9 = funcaobootstrap(amostragem50_exp, 100)
+aux10 = funcaobootstrap(amostragem100_exp, 100)
+aux11 = funcaobootstrap(amostragem500_exp, 500)
+aux12 = funcaobootstrap(amostragem1000_exp, 1000)
+
+#Parte VI) Aplicação da função monte carlo, para os diferentes tamanhos das amostras- com distribuição normal e exponencial
+aux_1 = montecarlonorm(amostragem5_normal, 5)
+aux_2 = montecarlonorm(amostragem30_normal, 30)
+aux_3 = montecarlonorm(amostragem50_normal, 50)
+aux_4 = montecarlonorm(amostragem100_normal, 100)
+aux_5 = montecarlonorm(amostragem500_normal, 500)
+aux_6 = montecarlonorm(amostragem1000_normal, 1000)
+
+aux_7 = montecarloexp(amostragem5_exp, 5)
+aux_8 = montecarloexp(amostragem30_exp, 30)
+aux_9 = montecarloexp(amostragem50_exp, 100)
+aux_10 = montecarloexp(amostragem100_exp, 100)
+aux_11 = montecarloexp(amostragem500_exp, 500)
+aux_12 = montecarloexp(amostragem1000_exp, 1000)
+```
+
+### Exemplo prático:
+No trabalho anterior, da disciplina de Pacotes estatísticos, nosso grupo (grupo 14) utilizou a função kable_styling em 3 ocasiões. Inclusive, a averiguação da utilizada prática desse pacote, foi o que levou a escolha do mesmo.  
+Nesse sentido, as duas primeiras tabelas foram construidas visando a análise do impacto do tamanho amostral no intervalo de confiança bootstrap, estimador pontual e erro amostral.
+
+
+<center>
+```{r Tabela1e2, echo=TRUE, message=FALSE, warning=FALSE}
+
+tabela1 = array(c(aux1[[c(1,1)]], aux2[[c(1, 1)]], aux3[[c(1,1)]], aux4[[c(1,1)]], aux5[[c(1,1)]], aux6[[c(1,1)]], aux1[[2]], aux2[[2]], aux3[[2]], aux4[[2]], aux5[[2]], aux6[[2]], aux1[[c(3,1)]], aux2[[c(3, 1)]], aux3[[c(3,1)]], aux4[[c(3,1)]], aux5[[c(3,1)]], aux6[[c(3,1)]]), c(6, 3))
+
+dimnames(tabela1) = list(c("Normal(n = 5)", "Normal(n = 30)", "Normal(n = 50)", "Normal(n = 100)", "Normal(n = 500)", "Normal(n = 1000)"), c("Estimador Pontual ", "Intervalo de Confiança", "Erro Padrão"))
+
+tabela2 = array(c(aux7[[c(1,1)]], aux8[[c(1, 1)]], aux9[[c(1,1)]], aux10[[c(1,1)]], aux11[[c(1,1)]], aux12[[c(1,1)]], aux7[[2]], aux8[[2]], aux9[[2]], aux10[[2]], aux11[[2]], aux12[[2]], aux7[[c(3,1)]], aux8[[c(3, 1)]], aux9[[c(3,1)]], aux10[[c(3,1)]], aux11[[c(3,1)]], aux12[[c(3,1)]]), c(6, 3))
+
+dimnames(tabela2) = list(c("Exponencial(n = 5)", "Exponencial(n = 30)", "Exponencial(n = 50)", "Exponencial(n = 100)", "Exponencial(n = 500)", "Exponencial(n = 1000)"), c("Estimador Pontual" , "Intervalo de Confiança", "Erro Padrão"))
+
+kable_styling(kable(tabela1, align = "c", caption = "Tabela de Variância, Intervalo de Confiança e Erro Padrão para o Método Bootstrap Normal"), bootstrap_options = c("striped", "hover"), full_width = FALSE, html_font = 'Montserrat')
+
+kable_styling(kable(tabela2, align = "c", caption = "Tabela de Variância, Intervalo de Confiança e Erro Padrão para o Método Bootstrap Exponencial"), bootstrap_options = c("striped", "hover"), full_width = FALSE, html_font = 'Montserrat')
+
+```
+</center>
+
+Outro exemplo de uso da função  **kable_styling** , na tabela a seguir comparou-se a proporção obtida para os parâmetros no método Bootstrap e no método paramérico, considerando os diferentes tamanhos de amostra de duas distribuições: normal e exponencial.
+
+<center>
+<div style="width:790px;">
+```{r Tabela3e4, echo=FALSE}
+
+tabela3 = matrix(c(aux_1, aux_2, aux_3, aux_4, aux_5, aux_6), c(6, 2), byrow = TRUE)
+
+dimnames(tabela3) = list(c("Normal(n = 5)", "Normal(n = 30)", "Normal(n = 50)", "Normal(n = 100)", "Normal(n = 500)", "Normal(n = 1000)"), c("Bootstrap", "Paramétrico"))
+
+tabela4 = matrix(c(aux_7, aux_8, aux_9, aux_10, aux_11, aux_12), c(6, 2), byrow = TRUE)
+
+dimnames(tabela4) = list(c("Exponencial(n = 5)", "Exponencial(n = 30)", "Exponencial(n = 50)", "Exponencial(n = 100)", "Exponencial(n = 500)", "Exponencial(n = 1000)"), c("Bootstrap", "Paramétrico"))
+
+kable_styling(kable(tabela3, align = "c", caption = "Proporção Monte Carlo Normal"), bootstrap_options = c("striped", "hover"), full_width = FALSE, html_font = 'Montserrat', position = "float_left")
+
+kable_styling(kable(tabela4, align = "c", caption = "Proporção Monte Carlo Exponencial"), bootstrap_options = c("striped", "hover"), full_width = FALSE, html_font = 'Montserrat', position = "right")
+
+```
+<div>
+</center>
+
+## Temas alternativos
+O *kableExtra* usa os temas de bootstrap integrados por padrão em kable_styling(). Como alternativa, é possível personalizar utilizando:kable_paper, kable_classic, kable_classic_2, kable_minimal, kable_material, kable_material_dark, com as opções **hover** e ***striped**.
+
+
+```{r}
+base %>%
+  kable_classic("basic", full_width = F,font_size = 9)
+```
+
+```{r}
+base %>%
+  kable_classic_2("hover", html_font = "Cambria",font_size = 9, full_width = F,position="center")
+```
+
+```{r}
+base %>%
+  kable_paper("hover", html_font = "Arial",font_size = 9, full_width = F,position = "right") %>% 
+  column_spec(2, width = "30em", background = "purple",color="white")
+```
+```{r}
+base %>%
+  kable_minimal("hover", html_font = "Arial",font_size = 9, full_width = F)
+```
+```{r}
+base %>%
+  kable_material("basic", html_font = "Cambria",font_size = 9, full_width = F)
+```
+```{r}
+base %>%
+  kable_material_dark("basic", html_font = "Arial",font_size = 9, full_width = F) %>%
+  add_header_above(c( "Group 1" = 2, "Group 2" = 2, " Tipo da Flor" = 1)) %>%
+  add_header_above(c("TABELA IRIS" = 5))
+
+```
+
+A partir dos exemplos acima, é possível ver que os argumentos de estilização das tabelas usados na função kable_styling, também podem ser utilizados para as funções: kable_paper, kable_classic, kable_classic_2, kable_minimal, kable_material, kable_material_dark.
+
+
+# Considerações Finais
+
+# Referências
+\
+[Sobre o Kableclassic](https://rdrr.io/cran/kableExtra/man/kable_classic.html)
+\
+[KableExtra](https://haozhu233.github.io/kableExtra/awesome_table_in_html.html#CellText_Specification)
+\
+[Rdocumentation](https://www.rdocumentation.org/packages/knitr/versions/1.33/topics/kable)
+\
+[Intervalos de confiança baseados na deviance](leg.ufpr.br/~paulojus/embrapa/Rembrapa/Rembrapase18.html)
+\
+[Kable](https://stackoverflow.com/questions/64000421/how-to-use-pagedown-and-kable-in-r-to-print-a-table-followed-by-a-page-break)
+\
