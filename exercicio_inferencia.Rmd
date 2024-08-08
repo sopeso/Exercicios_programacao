@@ -1,0 +1,198 @@
+---
+title: "Inferencia"
+author: "Sophia e Eliana"
+date: "2023-12-04"
+output: html_document
+---
+
+## Exponencial e Uniforme
+
+Para as seguintes distribuições de probabilidade:
+(ii) Exponecial com algum parâmetro λ ( 0.01 );
+(iii) Uniforme(1, 5) 
+Encontre o tamanho da amostra, n, tal que o Teorema Central do Limite seja válido.
+
+```{r message=FALSE, warning=FALSE}
+verificar_TCL <- function(distribuicao, parametros, tamanho_minimo) {
+  while(TRUE) {
+    set.seed(55)  # Define uma semente para reprodução dos resultados
+    # Gera a amostra com base na distribuição e parâmetros fornecidos
+    if(distribuicao == "exponencial") {
+      amostra <- rexp(tamanho_minimo, parametros$lambda)
+    } else if (distribuicao == "uniforme") {
+      amostra <- runif(tamanho_minimo, parametros$a, parametros$b)
+    } else {
+      cat("Distribuição não reconhecida.")
+      return(NULL)
+    }
+    
+    # Teste de normalidade (Kolmogorov-Smirnov e Shapiro-Wilk)
+    ks_test <- ks.test(amostra, "pnorm", mean = mean(amostra), sd = sd(amostra))
+    shapiro_test <- shapiro.test(amostra)
+    
+    p_valor_ks <- ks_test$p.value
+    p_valor_shapiro <- shapiro_test$p.value
+    
+    if (p_valor_ks < 0.05 & p_valor_shapiro < 0.05) {
+      break  # Se os p-valores forem maiores ou iguais a 0.05, interrompe o loop
+    } else {
+      tamanho_minimo <- tamanho_minimo + 1
+    }
+  }
+  
+  return(tamanho_minimo)
+}
+
+# Parâmetros para as diferentes distribuições
+parametros <- list(
+  exponencial = list(lambda = 0.01), # Parâmetros da distribuição exponencial
+  uniforme = list(a = 1, b = 5)      # Parâmetros da distribuição uniforme
+)
+
+for (distribuicao in names(parametros)) {
+  tamanho_minimo <- 5  # Tamanho inicial da amostra
+  
+  # Verifica o tamanho mínimo da amostra para o TCL ser válido
+  tamanho_amostra_valido <- verificar_TCL(distribuicao, parametros[[distribuicao]], tamanho_minimo)
+  
+  cat("Para a distribuição", distribuicao, "o tamanho mínimo da amostra para o TCL ser válido é:", tamanho_amostra_valido, "\n")
+  
+  # Gera a amostra com base na distribuição e parâmetros fornecidos
+  set.seed(55) # Defina uma semente para reprodução dos resultados
+  if (distribuicao == "exponencial") {
+    amostra <- rexp(tamanho_amostra_valido, parametros[[distribuicao]]$lambda)
+  } else if (distribuicao == "uniforme") {
+    amostra <- runif(tamanho_amostra_valido, parametros[[distribuicao]]$a, parametros[[distribuicao]]$b)
+  }
+  
+  # Configura o layout gráfico para 2x2
+  par(mfrow = c(2, 2))
+  
+  # Verificação visual da normalidade
+  hist(amostra, col = "skyblue", main = paste("Histograma da Amostra - Distribuição", distribuicao),
+       xlab = "Valores", ylab = "Frequência")
+  
+  qqnorm(amostra, main = paste("QQ Plot - Distribuição", distribuicao))
+  qqline(amostra)
+  
+  # Restaura o layout gráfico padrão
+  par(mfrow = c(1, 1))
+}
+```
+
+A análise estatística realizada através do código buscou determinar os tamanhos mínimos de amostra necessários para aplicar o Teorema Central do Limite (TCL) em duas distribuições distintas: exponencial e uniforme.
+
+O código foi estruturado para aumentar gradativamente o tamanho da amostra a partir de um valor inicial de 5 observações. Este procedimento iterativo gerou amostras aleatórias baseadas nas distribuições especificadas e verificou a proximidade dessas amostras com uma distribuição normal.
+
+Os testes estatísticos de Kolmogorov-Smirnov e Shapiro-Wilk foram utilizados para verificar a normalidade das amostras. Esses testes foram aplicados repetidamente até que os p-valores indicassem uma possível normalidade.
+
+Os resultados revelaram que para a distribuição exponencial, o tamanho mínimo de amostra para validar o TCL foi de 52 observações. No entanto, para a distribuição uniforme, o código indicou um tamanho mínimo de amostra maior, precisando de 473 observações para que o TCL fosse aplicável.
+
+Essa diferença no tamanho mínimo de amostra entre as distribuições pode ser atribuída às características intrínsecas das distribuições. A distribuição uniforme, por ter uma variação maior e uma maior dispersão dos dados dentro do intervalo, demandou um tamanho amostral significativamente maior para que a média das amostras se aproximasse de uma distribuição normal.
+
+Além dos testes estatísticos, o código gerou representações gráficas dos dados, apresentando histogramas e gráficos QQ-Plot, proporcionando uma visualização detalhada das distribuições das amostras e sua relação com a distribuição normal.
+
+## Binomial
+
+Para as seguintes distribuições de probabilidade:
+(i) Binomial ou Bernoulli com probabilidades de sucesso p < 0, 1 e p = 0, 5;
+Encontre o tamanho da amostra, n, tal que o Teorema Central do Limite seja válido.
+
+```{r message=FALSE, warning=FALSE}
+# Função para calcular o tamanho da amostra para Binomial
+calcular_tamanho_amostra_binomial <- function(p, margem_erro) {
+  n <- ceiling((p * (1 - p)) / (margem_erro^2))
+  return(n)
+}
+
+# Exemplo de uso
+p <- 0.5 #Prob de sucesso
+margem_erro <- 0.001  # Margem de erro desejada
+tamanho_amostra <- calcular_tamanho_amostra_binomial(p, margem_erro)
+cat("Tamanho da amostra necessário para Binomial:", tamanho_amostra, "\n")
+
+```
+```{r message=FALSE, warning=FALSE}
+# Função para calcular o tamanho da amostra para Binomial
+calcular_tamanho_amostra_binomial <- function(p, margem_erro) {
+  n <- ceiling((p * (1 - p)) / (margem_erro^2))
+  return(n)
+}
+
+# Exemplo de uso
+p <- 0.09 #Prob de sucesso
+margem_erro <- 0.001  # Margem de erro desejada
+tamanho_amostra <- calcular_tamanho_amostra_binomial(p, margem_erro)
+cat("Tamanho da amostra necessário para Binomial:", tamanho_amostra, "\n")
+
+```
+
+O código disponibiliza uma função chamada calcular_tamanho_amostra_binomial, projetada para determinar o tamanho de amostra necessário em distribuições binomiais Esta função utiliza a probabilidade de sucesso (p) e uma margem de erro desejada (margem_erro) para calcular o tamanho da amostra necessário para atingir uma precisão específica.
+
+Em um dos exemplos fornecidos, ao utilizar uma probabilidade de sucesso (p) de 0.09 e uma margem de erro (margem_erro) de 0.001, o tamanho da amostra calculado foi de 81900. No segundo exemplo, ao utilizar uma probabilidade de sucesso (p) de 0.5 e a mesma margem de erro (margem_erro) de 0.001, o tamanho da amostra calculado foi de 250000. Notavelmente, quando a probabilidade de sucesso se aproxima de 0.5, o tamanho da amostra necessário para a mesma precisão aumenta consideravelmente, dobrando em relação ao exemplo anterior.
+
+
+```{r message=FALSE, warning=FALSE}
+
+verificar_TCL <- function(distribuicao, parametros, tamanho_maximo) {
+  n <- 2  # Inicializa com um tamanho de amostra mínimo de 2
+  
+  while(TRUE) {
+    set.seed(55)  # Define uma semente para reprodução dos resultados
+    
+    if(distribuicao == "exponencial") {
+      amostra <- matrix(rexp(n * tamanho_maximo, parametros$lambda), ncol = n)
+      soma_normalizada <- (rowSums(amostra) - n * parametros$lambda) / sqrt(n * parametros$lambda)
+      acumulada_soma <- pnorm(soma_normalizada)
+    } else if (distribuicao == "uniforme") {
+      amostra <- matrix(runif(n * tamanho_maximo, parametros$a, parametros$b), ncol = n)
+      soma_normalizada <- (rowSums(amostra) - n * (parametros$a + parametros$b) / 2) / sqrt((n^3) * (parametros$b - parametros$a)^2 / 12)
+      acumulada_soma <- pnorm(soma_normalizada)
+    } else if (distribuicao == "binomial"){
+      amostra <- matrix(rbinom(n * tamanho_maximo, size = parametros$n, prob = parametros$p), ncol = n)
+      soma_normalizada <- (rowSums(amostra) - n * parametros$n * parametros$p) / sqrt(n * parametros$n * parametros$p * (1 - parametros$p))
+      acumulada_soma <- pnorm(soma_normalizada)
+    } else {
+      cat("Distribuição não reconhecida.")
+      return(NULL)
+    }
+    
+    diferenca <- max(abs(acumulada_soma - pnorm(acumulada_soma)))
+    
+    if (diferenca < 0.001) {
+      cat("Tamanho da amostra (n) que aproxima a distribuição da média para uma distribuição normal:", n)
+      break
+    }else{
+    
+    n <- n + 1  
+    }
+    }
+}
+
+# Parâmetros para a distribuição escolhida
+parametros_exponencial <- list(lambda = 0.3)  # Parâmetros para a distribuição exponencial
+parametros_uniforme <- list(a = 1, b = 10)   # Parâmetros para a distribuição uniforme
+parametros_binomial <- list(n = 10, p = 0.3) # Parâmetros para a distribuição binomial
+
+# Chama a função para a distribuição exponencial
+verificar_TCL("exponencial", parametros_exponencial, tamanho_maximo = 1000)
+
+# Chama a função para a distribuição uniforme
+verificar_TCL("uniforme", parametros_uniforme, tamanho_maximo = 1000)
+
+# Chama a função para a distribuição binomial
+verificar_TCL("binomial", parametros_binomial, tamanho_maximo = 1000)
+
+
+
+```
+O código verificar_TCL implementa um método para encontrar o tamanho da amostra necessário para que a distribuição da média amostral se aproxime de uma distribuição normal, seguindo o Teorema Central do Limite (TCL). O TCL afirma que, sob certas condições, a média de um grande número de observações independentes de qualquer distribuição tende a se aproximar de uma distribuição normal.
+
+A função começa com um tamanho de amostra mínimo de 2 e incrementa gradualmente esse tamanho até um limite máximo definido (tamanho_maximo). Para cada tamanho de amostra, ela gera um número de observações da distribuição especificada (exponencial, uniforme ou binomial), calcula a média dessas observações e, em seguida, normaliza a média pela média e desvio padrão esperados sob a distribuição correspondente.
+
+No caso da distribuição exponencial (exponencial), a média e o desvio padrão são usados para normalizar a média das observações.
+Para a distribuição uniforme (uniforme), a média e o desvio padrão são usados com base nos parâmetros especificados (a e b) para normalizar a média das observações.
+Já na distribuição binomial (binomial), a média e o desvio padrão esperados são usados para normalizar a média das observações.
+Após normalizar a média amostral, o código calcula a distribuição acumulada dessa média normalizada e compara essa distribuição acumulada com a distribuição acumulada normal. Ele avalia a diferença entre essas duas distribuições acumuladas. Se a diferença entre essas distribuições for menor que 0.001, o código identifica o tamanho da amostra (n) como aquele em que a distribuição da média amostral se aproxima da distribuição normal.
+
+Nota:  Apesar da tentativa de implementação seguindo os conceitos discutidos em aula, a execução do código não obteve o resultado esperado. 
