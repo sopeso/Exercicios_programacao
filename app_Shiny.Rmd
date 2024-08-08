@@ -1,0 +1,184 @@
+---
+title: "Primeiro app Shiny"
+author: "Sophia Araújo"
+date: "14/08/2021"
+output: html_document
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+if(!require(shiny)){install.packages("shiny"); library(shiny)}
+if(!require(shinythemes)){install.packages("shinythemes"); library(shiny)}
+if(!require(MASS)){install.packages("MASS"); library(MASS)}
+if(!require(ggplot2)){install.packages("ggplot2"); library(ggplot2)}
+if(!require(tidyverse)){install.packages("tidyverse"); library(tidyverse)}
+
+data("VA")
+
+
+# Definindo a interface do usario 
+ui = fluidPage(
+  #Tema
+  theme = shinytheme("slate"),
+  # Titulo
+  titlePanel("Lista 11 - Sophia Araújo"),
+  # Menu
+  navbarPage("Menu:",
+             
+             # Base
+             tabPanel("Base de Dados",
+                      dataTableOutput("dados")),
+             
+             # Histograma
+             tabPanel("Histograma", 
+                      sidebarLayout(mainPanel(plotOutput("hist")),
+                        sidebarPanel(
+                          selectInput(inputId = "real",
+                                      label ="Selecione uma variável contínua:",
+                                      c("Dias de acompanhamento" = "stime",
+                                        "Idade" = "age",
+                                        "Pontuação de desempenho do paciente " = "Karn")),
+                          
+                          sliderInput(inputId = "bins",
+                                      label = "Número de quebras do histograma:",
+                                      min = 1,
+                                      max = 100,
+                                      value = 30)))),
+             
+                      # Boxplot
+                      tabPanel("Boxplot",
+                               sidebarLayout(mainPanel(plotOutput("boxplot")),
+                                 sidebarPanel(
+                                   selectInput(inputId = "real2", 
+                                               label = "Selecione uma variável contínua:",
+                                               c("Dias de acompanhamento" = "stime",
+                                                 "Idade" = "age",
+                                                 "Pontuação de desempenho do paciente " = "Karn")),
+                                   
+                                     checkboxInput("outliers", "Mostrar outliers", TRUE)))),
+             
+                      # GrÃ¡fico de barras
+                      tabPanel("Gráfico de barras",
+                               sidebarLayout(mainPanel(plotOutput("barplot")),
+                                 sidebarPanel(
+                                   selectInput(inputId ="cat",
+                                               label = "Selecione uma variável categórica:",
+                                               c("Status" = "status",
+                                                 "Tratamento" = "treat",
+                                                 "Tipo de celula" = "cell"))))),
+                      # Resumo
+                      tabPanel("Resumo",
+                               sidebarLayout(mainPanel(verbatimTextOutput("summary")),
+                                 sidebarPanel(
+                                   selectInput("var", "Selecione uma variÃ¡vel:",
+                                               c("Status" = "status",
+                                                 "Tratamento" = "treat",
+                                                 "Tipo de celula" = "cell")))))))
+                      
+
+# Definindo as funÃ§Ãµes
+
+server <- function(input, output) {
+
+  # Base de dados
+  output$dados <- renderDataTable({
+    UScereal})
+  
+  # Histograma
+  real = reactive({
+    real = switch(input$real,
+                  stime = VA$stime,
+                  status = VA$status,
+                  treat = VA$treat,
+                  age = VA$age,
+                  Karn = VA$Karn,
+                  diag.time = VA$diag.time,
+                  cell = VA$cell,
+                  prior = VA$prior)
+    real
+  })
+  output$hist=renderPlot({
+    bins=seq(min(real()), max(real()),
+             length.out = input$bins + 1)
+    hist(real(), breaks = bins,
+         col = "#C47AC0", border = "black",
+         main= "Histograma",
+         ylab= "FrequÃªncia", xlab="")
+  })  
+
+  
+  # Boxplot
+  real2 = reactive({
+    real2 = switch(input$real2,
+                  stime = VA$stime,
+                  status = VA$status,
+                  treat = VA$treat,
+                  age = VA$age,
+                  Karn = VA$Karn,
+                  diag.time = VA$diag.time,
+                  cell = VA$cell,
+                  prior = VA$prior)
+    real2
+  })
+  
+  output$boxplot <- renderPlot({
+    if(input$outliers){
+      graph <- ggplot(UScereal, aes(y=real2())) + 
+        geom_boxplot(col = "black", fill="#531CB3")+
+        labs(x= "", y= "Valores", title="Boxplot")+
+        theme_minimal()
+    }else{
+      graph <- ggplot(UScereal, aes(y=real2()), col = "black", fill="#531CB3") + 
+        geom_boxplot(outlier.shape = NA, col = "#531CB3", fill="#531CB3")+
+        labs(x= "", y= "Valores", title="Boxplot")+
+        theme_minimal()
+    }
+    
+    graph
+  })
+  
+ 
+  # GrÃ¡fico de barras
+  cat = reactive({
+    cat = switch(input$cat,
+                 status = VA$status,
+                 treat = VA$treat,
+                 cell = VA$cell)
+    
+    cat
+  })
+  
+  output$barplot <- renderPlot({
+    graph <- ggplot(data=VA) +
+      geom_bar(stat="count", aes( cat()), col = "#227C9D", fill ="#227C9D")+
+      labs(x= "", y="Frequência", title="Gráfico de barras")+
+      theme_minimal()
+    
+    graph
+  })
+  
+  # Resumo
+  var = reactive({
+    var = switch(input$var,
+                  stime = VA$stime,
+                  status = VA$status,
+                  treat = VA$treat,
+                  age = VA$age,
+                  Karn = VA$Karn,
+                  diag.time = VA$diag.time,
+                  cell = VA$cell,
+                  prior = VA$prior)
+    
+    var
+  })
+  
+  output$summary = renderPrint({
+    summary(var())
+  })
+}
+
+# Renderizando o app
+shinyApp(ui = ui, server = server)
+
+```
+
