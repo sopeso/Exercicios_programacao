@@ -1,0 +1,172 @@
+---
+title: "Lista ggplot"
+author: "Sophia Araújo de Moraes"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+## Carregue aqui todos os pacotes necessário
+install.packages("aplore3")
+library(aplore3)
+data(icu)
+
+install.packages("ggplot2")
+library("ggplot2")
+
+install.packages("ggforce")
+library(ggforce)
+
+
+install.packages('esquisse', repos = "http://cran.us.r-project.org")
+library(esquisse)
+
+install.packages('knitr', repos = "http://cran.us.r-project.org")
+library(knitr)
+
+```
+
+## Instruções
+
++ Rode em html ou word(se for o caso altere o preambulo)
++ Certifique-se que todo os códigos irão rodar, caso contrário, o item com erro receberá nota zero.
++ Envie apenas o arquivo .Rmd
++ Configure o tamanho da figura se achar necessário. Para isto basta clicar na engrenagem chunk onde é inserido o código do R.
+
+\
+
+
+## Questão 1
+a) Faça um gráfico de dispersão entre duas variáveis numéricas, de tal forma que a cor dos pontos seja definida por uma variáveis categorica e o tipo de ponto por outra variável categórica.
+
+```{r, echo=TRUE, fig.align="center"}
+head(icu)
+attach(icu)
+names(icu)
+summary(icu)
+
+ggplot(data = icu, aes(x = age, y = hra,color = as.factor(race), shape= as.factor(gender))) + 
+  geom_point() +
+  labs(title= "Relação entre idade e frequência cardiaca, tendo em vista a raça e gênero")+
+  ylab("Frequência cardíaca(batimentos / min)")+
+  xlab("Idade(anos)")
+```
+
+
+b) Utilizando o gráfico anterior, mude o titulo das duas legendas e também altere a sua posição para cima.
+
+```{r, echo=TRUE, fig.align="center"}
+g<-ggplot(data = icu, aes(x = age, y = hra,color = as.factor(race), shape= as.factor(gender))) + 
+  geom_point() +
+  labs(title= "Relação entre idade e frequência cardiaca, tendo em vista a raça e gênero")+
+  ylab("Frequência cardíaca(batimentos / min)")+
+  xlab("Idade(anos)")
+
+g<- g + guides(color=guide_legend("Raça"),shape= guide_legend("Gênero")) +
+  theme(legend.position="top")
+
+g
+
+```
+
+c) O pacote **ggforce** contém a função **facet_zoom()** que tem o intuito de dar um zoom em uma região do grafico a partir de uma condição.
+(https://www.data-imaginist.com/2019/the-ggforce-awakens-again/) 
+Utilizando o facet_zoom e o gráfico da letra b, faça um zoom em alguma posição do gráfico anterior.
+
+```{r, echo=TRUE, fig.align="center"}
+g<- g+ facet_zoom(xlim = c(50, 75), ylim = c(100,150), horizontal = FALSE)  
+
+g
+```
+
+## Questão 2
+Faça 2 gráficos com histogramas para uma variável numérica separando simultaneamente em paineis pelos níveis de duas variáveis categoricas (de preferência com poucos níveis). 
+
+- No primeiro gráfico, utilize o facet_grid();
+- No segundo gráfico,  utilize facet_wrap(). 
+
+Permita que os paineis tenham escalas diferentes se possível.
+
+```{r, echo=TRUE, fig.align="center"}
+
+ggplot(icu, aes(age)) + geom_histogram() + facet_grid(cpr~pre)
+
+ggplot(icu,aes(age)) +geom_histogram() +facet_wrap(cpr~pre,scales="free")
+```
+
+## Questão 3
+Em alguns gráficos os pontos podem ficar sobrepostos e isso dificulta a analise, pois não conseguimos saber quantos pontos existem naquela região. Para isso o ggplot tem o **geom_jitter()**, uma função semelhante ao geom_point(), mas gera uma pequena variação nos pontos para evitar a sobreposição.
+(https://ggplot2.tidyverse.org/reference/geom_jitter.html)
+
+a) Faça um boxplot comparando uma variável númerica nos níveis de uma variável categórica. Depois, utilize o geom_jitter() para adicionar os pontos nestes boxplots. Altere o deslocamento dos pontos em 0.2 e o seu formato do ponto definido segundo uma outra variável categórica. 
+
+```{r, echo=TRUE, fig.align="center"}
+ggplot( icu, aes( x = as.factor(gender), y = hra ) ) + theme_bw() +
+        geom_boxplot( outlier.shape = NA, alpha = 0.2, size = 0.5, outlier.colour = c("grey40") , outlier.size=2,width=0.8) +
+        scale_fill_manual(values=gray.colors(3)) + 
+        theme(axis.text=element_text(size=8), axis.title=element_text(size=9), 
+        strip.text = element_text(size=9),plot.margin = unit(c(0.05, 0.2, 0.05, 0.05), "cm"))+
+        labs(title="", x="Gênero", y="Frequência Cardiaca")+ geom_jitter(width = 0.2) 
+
+```
+
+b) Refaça o boxplot do item anterior (sem usar geom_jitter) e adicione pontos vermelhos que indicam onde está a média em cada um dos boxplots gerados.
+
+```{r, echo=TRUE, fig.align="center"}
+ggplot( icu, aes( x = as.factor(gender), y = hra ) ) + theme_bw() +
+        geom_boxplot( alpha = 0.2, size = 0.5, outlier.colour = c("grey40") , outlier.size=2,width=0.8) +
+        scale_fill_manual(values=gray.colors(3)) + 
+        theme(axis.text=element_text(size=8), axis.title=element_text(size=9), 
+        strip.text = element_text(size=9),plot.margin = unit(c(0.05, 0.2, 0.05, 0.05), "cm"))+
+        labs(title="", x="Gênero", y="Frequência Cardiaca") + stat_summary(geom = "point", fun.y = "mean", colour = "red", size = 2, fill=5)
+
+
+```
+
+## Questão 4
+Faça um gráfico de barras para representar duas variáveis categoricas ou discretas com poucas respostas. As barras devem ficar lado a lado.  
+```{r, echo=TRUE, fig.align="center"}
+summary(icu)
+ggplot(icu,aes= gender,aes(can, fill= gender)) + geom_bar(position= "dodge") + labs(x= "Gênero", y= "Frequência") + ggtitle("Relação entre Presença ou não de câncer de acordo com o gênero") + scale_fill_discrete (name = "Câncer" ) 
+
+
+```
+
+## Questão 5
+Utilize a função `esquisser` do pacote `esquisse` para fazer um gráfico de sua preferência e copie o código fornecido pela função. 
+```{r, echo=TRUE, fig.align="center"}
+ggplot(icu) +
+ aes(x = age) +
+ geom_histogram(bins = 30L, fill = "#228B22") +
+ labs(x = "Idade", y = "Frequência", 
+ title = "Histograma idade") +
+ theme_minimal() +
+ theme(plot.title = element_text(size = 17L), axis.title.y = element_text(size = 13L), 
+ axis.title.x = element_text(size = 13L)) +   theme(plot.title = element_text(hjust = 0.5))
+
+
+
+
+```
+
+
+## Questão 6
+Use o comando geom_line para fazer um gráfico da função densidade de probabilidade da distribuição Gamma com parametros iguais a 2 e 5.
+```{r, echo=TRUE, fig.align="center"}
+
+x <- round(rgamma(100000,shape = 2,scale = 5),1)
+x <- x[which(x>0)]
+
+t1 <- as.data.frame(table(x))
+names(t1) <- c("x","y")
+t1 <- transform(t1,x=as.numeric(as.character(x)))
+t1$y <- t1$y/sum(t1[,2])
+
+ggplot()  +     
+geom_line(aes(x=t1[,1],y=dgamma(t1[,1],2,0.2)),color="red") +  labs(x = "x", y="Distribuição Gamma", title= "Distribuição Gama- Parâmetros 2,5") +
+theme_classic()
+
+```
+
